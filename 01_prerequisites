@@ -35,3 +35,38 @@ warnings.filterwarnings('ignore')
 
 !gdown 1Lq2ixZ7Bd1PMwrlcDcsJFrgafFIQlQHb --output train.csv
 !gdown 1XGaw3Dc3DlVGZKf8yrWiF-69uENY8tDC --output test.csv
+
+
+df_train = pd.read_csv("train.csv") # 학습용 데이터
+print(df_train.shape)
+df_train = df_train[df_train.duplicated()==False].reset_index(drop=True)
+
+print(df_train.shape)
+# 'null' 값을 np.nan으로 변경
+df_train['is_converted'] = df_train['is_converted'].replace('null', np.nan)
+# is_converted 칼럼의 값이 null인 행 제거
+df_train = df_train.dropna(subset=['is_converted'])
+print(df_train.shape)
+df_test = pd.read_csv("test.csv") # 테스트 데이터(제출파일의 데이터)
+# test 데이터 id column 제거
+df_test = df_test.drop(["id"], axis=1)
+
+print(f"train데이터 형태: {df_train.shape}, test데이터 형태: {df_test.shape}")
+
+# 동일한 encoding을 적용하기 위해 train, test를 concat한다.
+df_all = pd.concat([df_train, df_test])
+print(f"df_all형태: {df_all.shape}")
+
+# df_all index 초기화
+df_all = df_all.reset_index(drop=True)
+
+# 'null' 값을 np.nan으로 변경
+df_all['is_converted'] = df_all['is_converted'].replace('null', np.nan)
+# is_converted 칼럼의 값이 null인 행 제거
+df_all = df_all.dropna(subset=['is_converted'])
+
+df_all['is_converted'].isna().sum() #잘 버려졌는지 확인
+df_all.shape
+
+# customer_country.1 drop
+df_all.drop("customer_country.1", axis=1, inplace = True)
